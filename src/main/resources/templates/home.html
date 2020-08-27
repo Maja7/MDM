@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:fragment="head">
+    <meta charset="UTF-8"/>
+    <title>MDM na razini države</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css"/>
+</head>
+<body>
+<div class="bg-light" style="width: 100%; height: 100%;">
+    <div class="container py-4">
+        <div class="card" style="margin: 0em 1em 1em; border-color: #37474F;">
+            <div class="card-header text-white" style="background-color: #263238;">
+                <h6 style="text-align: center;"
+                    th:text="'Dohvaćanje podataka iz registara RH prema OIB-u korisnika'"></h6>
+            </div>
+            <div class="card-body p-2">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label for="OIB">OIB korisnika</label>
+                        <input type="text" class="form-control" id="OIB" name="OIB" maxlength="11" minlength="11"/>
+                        <p id="OIB_error_message" class="registration-alert"></p>
+
+                        <!-- KLJUČNE RIJEČI-->
+                        <div class="form-group">
+                            <label for="select">Zahtjev za izdavanje dokumenta: </label>
+                            <select class="form-control" id="select">
+                                <option th:each="kr,iterator : ${kljucneRijeci}"
+                                        th:value="${kr.getId()}" th:text="${kr.getKljucnaRijec()}"></option>
+                            </select>
+                        </div>
+                        <!-- Označi podatke za dohvat ??-->
+
+
+                        <div class="d-flex" style="padding: 10px;">
+
+                            <a class="form-control btn btn-primary"
+                               style="background-color: #263238; border-color: #37474F; color: white;" id="save"
+                               th:onclick="'javascript:dohvatiPodatke();'">Pošalji zahtjev
+                            </a>
+                        </div>
+                        <br>
+
+                        <!-- PRIORITETI -->
+                        <div class="card-body p-2" style="margin-left: auto; margin-right: auto;">
+                            <div id="prioritet1" class="badge badge-danger"
+                                 style="margin-left: auto; margin-right: auto;"
+                                 th:text="'VAŽNO'"></div>
+                            <div id="prioritet2" class="badge badge-warning"
+                                 style="margin-left: auto; margin-right: auto;"
+                                 th:text="'SREDNJE'"></div>
+                            <div id="prioritet3" class="badge badge-info" style="margin-left: auto; margin-right: auto;"
+                                 th:text="'NIZAK'"><
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#podaciKorisnik">Podaci o korisniku</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#json">Podaci u JSON formatu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#putanje">Pregled načina dohvata podataka</a>
+                </li>
+            </ul>
+
+
+            <div class="tab-content">
+                <div id="podaciKorisnik" class="container tab-pane active">
+                    <div class="card" style="margin: 1em; border-color: #37474F;">
+                        <div class="card-header text-white" style="background-color: #263238;">
+                            Podaci o korisniku
+                        </div>
+                        <div class="card-body p-2">
+
+                            <div id="prikazOIB"></div>
+                            <div id="ime"></div>
+                            <div id="prezime"></div>
+                            <div id="djevojackoPrezime"></div>
+                            <div id="datumRodenja"></div>
+                            <div id="datumSmrti"></div>
+                            <div id="datumVjencanje"></div>
+                            <div id="oibSupruznika"></div>
+                            <div id="drzavljanstvo"></div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div id="json" class="container tab-pane fade">
+                    <div class="card" style="margin: 1em; border-color: #37474F;">
+                        <div class="card-header text-white" style="background-color: #263238;">
+                            JSON format podataka
+                        </div>
+                        <div class="card-body p-2">
+                            <p id="jsonIspis">{ JSON podaci ispis}</p>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div id="putanje" class="container tab-pane fade">
+
+                    <div class="card" style="margin: 1em; border-color: #37474F;">
+                        <div class="card-header text-white" style="background-color: #263238;">
+                            Dohvaćanje podataka:
+                        </div>
+                        <div class="card-body p-2">
+
+                            <p id="dohvacanjePodataka"></p>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    var error_OIB;
+    $(document).ready(function () {
+        serverContext = "http://localhost:8080";
+        $("#OIB_error_message").hide();
+        sakrijIspis();
+
+        $("#OIB").keyup(function () {
+            checkOIB();
+        });
+        $("#OIB").focusout(function () {
+            checkOIB();
+        });
+    });
+
+    function checkOIB() {
+        pattern = /^[0-9]*$/; //We want only numbers
+        oib = $("#OIB").val();
+
+        if (pattern.test(oib) && oib !== '' && oib.length == 11) {
+            $("#OIB_error_message").hide();
+            $("#OIB").css("border-bottom", "2px solid #34f358");
+        } else {
+            $("#OIB_error_message").html("OIB se treba sastojati od 11-znamenkastog niza brojeva(0-9)!");
+            $("#OIB_error_message").show();
+            $("#OIB").css("border-bottom", "2px solid #F90A0A");
+            error_OIB = true;
+        }
+
+    }
+
+    function dohvatiPodatke() {
+        sakrijIspis();
+        ocistiIspis();
+        idKljucnaRijec = $("#select").val();
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: serverContext + "/dohvatiPodatke",
+            data: {
+                oib: oib, id: idKljucnaRijec,
+            },
+            success: function (data) {
+                console.log(data);
+                if (data.prioritet == "Visoka") {
+                    $("#prioritet1").show();
+                } else if (data.prioritet == "Srednja") {
+                    $("#prioritet2").show();
+                } else if (data.prioritet == "Niska") {
+                    $("#prioritet3").show();
+                }
+                if (data.oib != null) {
+                    $("#prikazOIB").text('OIB: ' + data.oib);
+                    $("#prikazOIB").show();
+                }
+                
+                if (data.ime != null) {
+                    $("#ime").text('Ime: ' + data.ime);
+                    $("#ime").show();
+                }
+
+                if (data.prezime != null) {
+                    $("#prezime").text('Prezime: ' + data.prezime);
+                    $("#prezime").show();
+                }
+
+                if (data.djevojackoPrezime != null) {
+                    $("#djevojackoPrezime").text('Djevojačko prezime: ' + data.djevojackoPrezime);
+                    $("#djevojackoPrezime").show();
+                }
+
+                if (data.datumRodenja != null) {
+                    $("#datumRodenja").text('Datum rođenja: ' + data.datumRodenja);
+                    $("#datumRodenja").show();
+                }
+
+                if (data.datumSmrti != null) {
+                    $("#datumSmrti").text('Datum smrti: ' + data.datumSmrti);
+                    $("#datumSmrti").show();
+                }
+
+                if (data.datumVjencanja != null) {
+                    $("#datumVjencanja").text('Datum vjenčanja: ' + data.datumVjencanja);
+                    $("#datumVjencanje").show();
+                }
+
+                if (data.oibSupruznika != null) {
+                    $("#oibSupruznika").text('OIB supružnika: ' + data.oibSupruznika);
+                    $("#oibSupruznika").show();
+                }
+
+                if (data.drzavljanstvo != null) {
+                    $("#drzavljanstvo").text('Državljanstvo: ' + data.drzavljanstvo);
+                    $("#drzavljanstvo").show();
+                }
+
+                $("#jsonIspis").text(data.json);
+                $("#jsonIspis").show();
+
+                $("#dohvacanjePodataka").text(data.dohvacanjePodataka);
+                $("#dohvacanjePodataka").show();
+
+            },
+        });
+    }
+
+    function sakrijIspis() {
+        $("#prioritet1").hide();
+        $("#prioritet2").hide();
+        $("#prioritet3").hide();
+        $("#jsonIspis").hide();
+        $("#dohvacanjePodataka").hide();
+
+        $("#prikazOIB").hide();
+        $("#ime").hide();
+        $("#prezime").hide();
+        $("#djevojackoPrezime").hide();
+        $("#datumRodenja").hide();
+        $("#datumSmrti").hide();
+        $("#datumVjencanje").hide();
+        $("#oibSupruznika").hide();
+        $("#drzavljanstvo").hide();
+
+    }
+
+    function ocistiIspis() {
+        $("#jsonIspis").text('');
+        $("#dohvacanjePodataka").text('');
+
+        $("#prikazOIB").text('');
+        $("#ime").text('');
+        $("#prezime").text('');
+        $("#djevojackoPrezime").text('');
+        $("#datumRodenja").text('');
+        $("#datumSmrti").text('');
+        $("#datumVjencanje").text('');
+        $("#oibSupruznika").text('');
+        $("#drzavljanstvo").text('');
+    }
+
+</script>
+<footer class="footer text-muted ">
+    <div class="container " style="padding-top: 10px;">
+        <p class="h6">&copy; All right Reversed.</p>
+    </div>
+</footer>
+</body>
+</html>
