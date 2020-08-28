@@ -16,7 +16,7 @@ import java.util.List;
 @Service("restService")
 public class RESTService {
 
-    private static String path = "http://localhost:8080/rest/";
+    private static final String path = "http://localhost:8080/rest/";
     private static final String GET_KLJUCNE_RIJECI = path + "/dohvatiKljucneRijeci";
     private static final String GET_ALL_KORISNICI_RMR = path + "/usluge/matica-rodjenih";
     private static final String GET_ALL_KORISNICI_RMU = path + "/usluge/matica-umrlih";
@@ -265,10 +265,7 @@ public class RESTService {
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         ResponseEntity<String> response = rest.exchange(GET_POSTOJI_KORISNIK_RMR + oib, HttpMethod.GET, entity, String.class);
 
-        if (response.getBody().equals("false")) {
-            return false;
-        }
-        return true;
+        return !response.getBody().equals("false");
     }
     public boolean postojiKorisnikRMU(Long oib){
         RestTemplate rest = new RestTemplate();
@@ -278,10 +275,7 @@ public class RESTService {
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         ResponseEntity<String> response = rest.exchange(GET_POSTOJI_KORISNIK_RMU + oib, HttpMethod.GET, entity, String.class);
 
-        if (response.getBody().equals("false")) {
-            return false;
-        }
-        return true;
+        return !response.getBody().equals("false");
     }
     public boolean postojiKorisnikRMV(Long oib){
         RestTemplate rest = new RestTemplate();
@@ -291,10 +285,7 @@ public class RESTService {
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         ResponseEntity<String> response = rest.exchange(GET_POSTOJI_KORISNIK_RMV + oib, HttpMethod.GET, entity, String.class);
 
-        if (response.getBody().equals("false")) {
-            return false;
-        }
-        return true;
+        return !response.getBody().equals("false");
     }
     public boolean postojiKorisnikRKD(Long oib){
         RestTemplate rest = new RestTemplate();
@@ -304,9 +295,6 @@ public class RESTService {
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         ResponseEntity<String> response = rest.exchange(GET_POSTOJI_KORISNIK_RKD + oib, HttpMethod.GET, entity, String.class);
 
-        if (response.getBody().equals("false")) {
-            return false;
-        }
-        return true;
+        return !response.getBody().equals("false");
     }
 }

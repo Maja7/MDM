@@ -50,10 +50,7 @@ public class RESTResource {
     public boolean getPostojiKorisnikRMRByOIB(
             @RequestParam("OIB") Long OIB) {
         KorisnikRegistarMaticeRodjenih k = korisnikRMRRepozitorij.findByOib(OIB);
-        if (k!=null){
-            return true;
-        }
-        return false;
+        return k != null;
     }
 
     //REGISTAR MATICE UMRLIH
@@ -77,10 +74,7 @@ public class RESTResource {
     public boolean getPostojiKorisnikRMUByOIB(
             @RequestParam("OIB") Long OIB) {
         KorisnikRegistarMaticeUmrlih k = korisnikRMURepozitorij.findByOib(OIB);
-        if (k!=null){
-            return true;
-        }
-        return false;
+        return k != null;
     }
 
     //REGISTAR MATICE VJENČANIH
@@ -104,10 +98,7 @@ public class RESTResource {
     public boolean getPostojiKorisnikRMVByOIB(
             @RequestParam("OIB") Long OIB) {
         KorisnikRegistarMaticeVjencanih k = korisnikRMVRepozitorij.findByOib(OIB);
-        if (k!=null){
-            return true;
-        }
-        return false;
+        return k != null;
     }
 
     //REGISTAR KNJIGE DRŽAVLJANA
@@ -131,9 +122,6 @@ public class RESTResource {
     public boolean getPostojiKorisnikRKDByOIB(
             @RequestParam("OIB") Long OIB) {
         KorisnikRegistarKnjigaDrzavljana k = korisnikRKDRepozitorij.findByOib(OIB);
-        if (k!=null){
-            return true;
-        }
-        return false;
+        return k != null;
     }
 }
