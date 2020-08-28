@@ -70,7 +70,7 @@ public class IndexController {
 
         for (RijecServis rs : listaPrioritetaKljucneRijeci) {
 
-            dohvacanjePodataka += System.lineSeparator() + "Prioritet razine: " +
+            dohvacanjePodataka += "Prioritet razine: " +
                     prioritetRepozitorij.findById(rs.getPrioritetId()).getRazinaPrioriteta() + " [web servis: " +
                     webServisRepozitorij.findById(rs.getWebServisId()).getPutanja() + "]";
 
@@ -191,11 +191,11 @@ public class IndexController {
     private void postaviPodatke() {
         podaci.setPrioritet(prioritetRepozitorij.findById(razinaPrioriteta).getRazinaPrioriteta());
         podaci.setWebServis(webServisRepozitorij.findById(webServis).getPutanja());
-        dohvacanjePodataka += System.lineSeparator() + "-------------------------------------------------" +
-                System.lineSeparator() + "    ODABRANI PODACI ZA DOHVAT PODATAKA:" + System.lineSeparator() +
-                System.lineSeparator() + "Prioritet: " + podaci.getPrioritet() +
-                System.lineSeparator() + "Web servis: " + podaci.getWebServis() +
-                System.lineSeparator() + "-------------------------------------------------";
+        dohvacanjePodataka += System.getProperty("line.separator")+"\r\n-------------------------------------------------" +
+                "   ODABRANI PODACI ZA DOHVAT PODATAKA:" + System.getProperty("line.separator")+
+                System.getProperty("line.separator")+"\r\nPrioritet: " + podaci.getPrioritet() +
+                System.getProperty("line.separator")+"Web servis: " + podaci.getWebServis() +
+                System.getProperty("line.separator")+"-------------------------------------------------";
 
 
         serverid = webServisRepozitorij.findById(webServis).getServerId();
