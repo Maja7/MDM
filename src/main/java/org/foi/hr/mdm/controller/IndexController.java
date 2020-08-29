@@ -33,7 +33,13 @@ public class IndexController {
     RegistarRepozitorij registarRepozitorij;
     @Autowired
     InstitucijaRepozitorij institucijaRepozitorij;
+    @Autowired
+    PodatakRepozitorij podatakRepozitorij;
+    @Autowired
+    PodatakURegistruRepozitorij podatakURegistruRepozitorij;
+
     IspisPodataka podaci = new IspisPodataka();
+
     int razinaPrioriteta = 9999;
     int webServis = 0;
     String dohvacanjePodataka = "";
@@ -46,14 +52,22 @@ public class IndexController {
     public String homePage(Model model) throws Exception {
 
         List<KljucnaRijec> kljucneRijeci = restService.getKljucneRijeci().getListaKljucnihRijeci();
+        List<Podatak> listaPodataka = podatakRepozitorij.findAll();
         model.addAttribute("kljucneRijeci", kljucneRijeci);
+        model.addAttribute("podaci", listaPodataka);
         return "home";
     }
 
     @RequestMapping(value = "/dohvatiPodatke", method = RequestMethod.POST)
     @ResponseBody
     public IspisPodataka getData(HttpServletRequest request, @RequestParam("oib") String OIB,
-                                 @RequestParam("id") int id) {
+                                 @RequestParam("id") int id, @RequestParam("pIme") boolean ime,
+                                 @RequestParam("pPrezime") boolean prezime, @RequestParam("pDatumRodenja") boolean datumRodjenja,
+                                 @RequestParam("pDrzavljanstvo") boolean drzavljanstvo,
+                                 @RequestParam("pDjevojackoPrezime") boolean djevojackoPrezime,
+                                 @RequestParam("pDatumVjencanja") boolean datumVjencanja,
+                                 @RequestParam("pOIBSupruznika") boolean OIBsupruznika,
+                                 @RequestParam("pDatumSmrti") boolean datumSmrti) {
         podaci = new IspisPodataka();
         dohvacanjePodataka = "";
         razinaPrioriteta = 9999;
@@ -179,6 +193,95 @@ public class IndexController {
                     + "Za korisnika s OIB-om: " + oib + " ne postoje podaci niti u jednom registru";
         }
 
+        if(ime || prezime || datumRodjenja || drzavljanstvo || datumVjencanja ||djevojackoPrezime ||
+        OIBsupruznika || datumSmrti){
+            dohvacanjePodataka += "-----------------------------------------"+
+                    "Dohvaćanje dodatno označenih podataka ... ";
+        }
+        else {
+            dohvacanjePodataka += "Niti jedan dodatni podatak nije označen. " +
+                    "Dohvaćanje podataka za korisnika je završeno.";
+        }
+        if (ime){
+        PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(1);
+            int reg = pr.getRegistarId();
+            //na temelju registra bi trebali doći do podataka
+            //ovo je malo hardkodirano jer su relacije s korisnicima odvojene
+            if(korisnikPostojiRMR){
+                podaci.setIme(restService.getKorisnikRMR(oib).getIme());
+            }else{
+                dohvacanjePodataka+="U definiranom registru nema podatka [ime] za korisnika s oibom: "+oib;
+            }
+
+        }
+        if(prezime){
+            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(2);
+            int reg = pr.getRegistarId();
+            if(korisnikPostojiRMR){
+                podaci.setPrezime(restService.getKorisnikRMR(oib).getPrezime());
+            }else{
+                dohvacanjePodataka+="U definiranom registru nema podatka [prezime] za korisnika s oibom: "+oib;
+            }
+
+        }
+        if(datumRodjenja){
+            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(3);
+            int reg = pr.getRegistarId();
+            if(korisnikPostojiRMR){
+                podaci.setDatumRodenja(restService.getKorisnikRMR(oib).getDatumRodenja());
+            }else{
+                dohvacanjePodataka+="U definiranom registru nema podatka [datum rođenja] za korisnika s oibom: "+oib;
+            }
+        }
+        if(drzavljanstvo){
+            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(4);
+            int reg = pr.getRegistarId();
+            if(korisnikPostojiRKD){
+                podaci.setDrzavljanstvo(restService.getKorisnikRKD(oib).getDrzavljanstvo());
+            }else{
+                dohvacanjePodataka+="U definiranom registru nema podatka [državljanstvo] za korisnika s oibom: "+oib;
+            }
+        }
+        if(djevojackoPrezime){
+            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(5);
+            int reg = pr.getRegistarId();
+            if(korisnikPostojiRMV){
+                podaci.setDjevojackoPrezime(restService.getKorisnikRMV(oib).getDjevojackoPrezime());
+            }else{
+                dohvacanjePodataka+="U definiranom registru nema podatka [djevojačko prezime] za korisnika s oibom: "+oib;
+            }
+
+        }
+        if(datumVjencanja){
+            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(6);
+            int reg = pr.getRegistarId();
+            if(korisnikPostojiRMV){
+                podaci.setDatumVjencanja(restService.getKorisnikRMV(oib).getDatumVjencanja());
+            }else{
+                dohvacanjePodataka+="U definiranom registru nema podatka [datum vjenčanja] za korisnika s oibom: "+oib;
+            }
+
+        }
+        if(OIBsupruznika){
+            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(7);
+            int reg = pr.getRegistarId();
+            if(korisnikPostojiRMV){
+                podaci.setOIBsupruznika(restService.getKorisnikRMV(oib).getOIBSupruznika());
+            }else{
+                dohvacanjePodataka+="U definiranom registru nema podatka [OIB supružnika] za korisnika s oibom: "+oib;
+            }
+
+        }
+        if(datumSmrti){
+            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(8);
+            int reg = pr.getRegistarId();
+            if(korisnikPostojiRMU){
+                podaci.setDatumSmrti(restService.getKorisnikRMU(oib).getDatumSmrti());
+            }else{
+                dohvacanjePodataka+="U definiranom registru nema podatka [datum smrti] za korisnika s oibom: "+oib;
+            }
+
+        }
 
         podaci.setJson(podaci.toString());
         podaci.setDohvacanjePodataka(dohvacanjePodataka);

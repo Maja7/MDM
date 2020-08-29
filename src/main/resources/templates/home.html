@@ -32,6 +32,18 @@
                             </select>
                         </div>
                         <!-- Označi podatke za dohvat ??-->
+                        <div class="card">
+                            <a class="btn" data-toggle="collapse" href="#demo">Označi dodatne podatke za prikaz</a>
+                            <div id="demo" class="collapse ">
+                                <div class="card-body">
+                                    <div class="checkbox" th:each="p, iterator : ${podaci}">
+
+                                        <input th:id="${p.getId()}" type="checkbox" value="true"/>
+                                        <label th:for="${p.getId()}" class="checkbox-text" th:text="${p.getVrstaPodatka()}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
                         <div class="d-flex" style="padding: 10px;">
@@ -168,13 +180,17 @@
     function dohvatiPodatke() {
         sakrijIspis();
         ocistiIspis();
+        provjeriPodatke();
+
         idKljucnaRijec = $("#select").val();
         $.ajax({
             async: false,
             type: "POST",
             url: serverContext + "/dohvatiPodatke",
             data: {
-                oib: oib, id: idKljucnaRijec,
+                oib: oib, id: idKljucnaRijec, pIme:pIme, pPrezime:pPrezime, pDatumRodenja:pDatumRodenja,
+                pDrzavljanstvo:pDrzavljanstvo, pDjevojackoPrezime:pDjevojackoPrezime, pDatumVjencanja:pDatumVjencanja,
+                pOIBSupruznika:pOIBSupruznika, pDatumSmrti:pDatumSmrti,
             },
             success: function (data) {
                 console.log(data);
@@ -216,12 +232,12 @@
                 }
 
                 if (data.datumVjencanja != null) {
-                    $("#datumVjencanja").text('Datum vjenčanja: ' + data.datumVjencanja);
-                    $("#datumVjencanja").show();
+                    $("#datumVjencanje").text('Datum vjenčanja: ' + data.datumVjencanja);
+                    $("#datumVjencanje").show();
                 }
 
-                if (data.oibSupruznika != null) {
-                    $("#oibSupruznika").text('OIB supružnika: ' + data.oibSupruznika);
+                if (data.oibsupruznika != null) {
+                    $("#oibSupruznika").text('OIB supružnika: ' + data.oibsupruznika);
                     $("#oibSupruznika").show();
                 }
 
@@ -272,6 +288,49 @@
         $("#datumVjencanje").text('');
         $("#oibSupruznika").text('');
         $("#drzavljanstvo").text('');
+    }
+
+    function provjeriPodatke() {
+        if( $("#1").is(':checked')){
+            pIme = true;
+        }else {
+            pIme=false;
+        }
+        if( $("#2").is(':checked')){
+            pPrezime = true;
+        }else {
+            pPrezime=false;
+        }
+        if( $("#3").is(':checked')){
+            pDatumRodenja = true;
+        }else {
+            pDatumRodenja=false;
+        }
+        if( $("#4").is(':checked')){
+            pDrzavljanstvo = true;
+        }else {
+            pDrzavljanstvo=false;
+        }
+        if( $("#5").is(':checked')){
+            pDjevojackoPrezime = true;
+        }else {
+            pDjevojackoPrezime=false;
+        }
+        if( $("#6").is(':checked')){
+            pDatumVjencanja = true;
+        }else {
+            pDatumVjencanja=false;
+        }
+        if( $("#7").is(':checked')){
+            pOIBSupruznika = true;
+        }else {
+            pOIBSupruznika=false;
+        }
+        if( $("#8").is(':checked')){
+            pDatumSmrti = true;
+        }else {
+            pDatumSmrti=false;
+        }
     }
 
 </script>

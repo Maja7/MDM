@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PodatakURegistruRepozitorij extends JpaRepository<PodatakURegistru, Integer> {
+    PodatakURegistru findByPodatakId(int id);
 }
