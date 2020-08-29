@@ -16,7 +16,7 @@ import java.util.List;
 @Service("restService")
 public class RESTService {
 
-    private static final String path = "http://localhost:8080/rest/";
+    private static final String path = "https://mdm-services.herokuapp.com/rest";
     private static final String GET_KLJUCNE_RIJECI = path + "/dohvatiKljucneRijeci";
     private static final String GET_ALL_KORISNICI_RMR = path + "/usluge/matica-rodjenih";
     private static final String GET_ALL_KORISNICI_RMU = path + "/usluge/matica-umrlih";

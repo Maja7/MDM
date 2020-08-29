@@ -335,7 +335,7 @@ public class IndexController {
         dohvacanjePodataka += System.lineSeparator() + "Za korisnika s OIB-om: " + oib +
                 " postoje podaci u registru \"Knjiga državljana\"" +
                 System.lineSeparator() + "Dohvat podataka o korisniku..." +
-                System.lineSeparator() + "http://localhost:8080/rest//usluge/knjiga-drzavljana/dohvatiPodatkeOKorisniku?OIB=" + oib;
+                System.lineSeparator() + "https://mdm-services.herokuapp.com/usluge/knjiga-drzavljana/dohvatiPodatkeOKorisniku?OIB=" + oib;
 
         KorisnikRegistarKnjigaDrzavljana k = restService.getKorisnikRKD(oib);
         podaci.setOib(k.getOib());
@@ -349,7 +349,7 @@ public class IndexController {
         dohvacanjePodataka += System.lineSeparator() + "Za korisnika s OIB-om: " + oib +
                 " postoje podaci u registru \"Matica rođenih\"" +
                 System.lineSeparator() + "Dohvaćam podatke o korisniku..." +
-                System.lineSeparator() + "http://localhost:8080/rest//usluge/matica-rodjenih/dohvatiPodatkeOKorisniku?OIB=" + oib;
+                System.lineSeparator() + "https://mdm-services.herokuapp.com/usluge/matica-rodjenih/dohvatiPodatkeOKorisniku?OIB=" + oib;
 
         KorisnikRegistarMaticeRodjenih k = restService.getKorisnikRMR(oib);
         podaci.setOib(k.getOib());
@@ -362,7 +362,7 @@ public class IndexController {
         dohvacanjePodataka += System.lineSeparator() + "Za korisnika s OIB-om: " + oib +
                 " postoje podaci u registru \"Matica vjenčanih\"" +
                 System.lineSeparator() + "Dohvaćam podatke o korisniku..." +
-                System.lineSeparator() + "http://localhost:8080/rest//usluge/matica-vjencanih/dohvatiPodatkeOKorisniku?OIB=" + oib;
+                System.lineSeparator() + "https://mdm-services.herokuapp.com/usluge/matica-vjencanih/dohvatiPodatkeOKorisniku?OIB=" + oib;
 
         KorisnikRegistarMaticeVjencanih k = restService.getKorisnikRMV(oib);
         podaci.setOib(k.getOib());
@@ -378,7 +378,7 @@ public class IndexController {
         dohvacanjePodataka += System.lineSeparator() + "Za korisnika s OIB-om: " + oib +
                 " postoje podaci u registru \"Matica umrlih\"" +
                 System.lineSeparator() + "Dohvaćam podatke o korisniku..." +
-                System.lineSeparator() + "http://localhost:8080/rest//usluge/matica-umrlih/dohvatiPodatkeOKorisniku?OIB=" + oib;
+                System.lineSeparator() + "https://mdm-services.herokuapp.com/usluge/matica-umrlih/dohvatiPodatkeOKorisniku?OIB=" + oib;
 
         KorisnikRegistarMaticeUmrlih k = restService.getKorisnikRMU(oib);
         podaci.setOib(k.getOib());
