@@ -21,6 +21,8 @@ public class IspisPodataka {
     private String institucija;
     private String server;
     private String jsonIspis;
+    private String usluga;
+    private String nacinIsporuke;
 
 
     public IspisPodataka() {
@@ -166,6 +168,22 @@ public class IspisPodataka {
 
     public void setJson(String json) {
         this.jsonIspis = json;
+    }
+
+    public String getUsluga() {
+        return usluga;
+    }
+
+    public void setUsluga(String usluga) {
+        this.usluga = usluga;
+    }
+
+    public String getNacinIsporuke() {
+        return nacinIsporuke;
+    }
+
+    public void setNacinIsporuke(String nacinIsporuke) {
+        this.nacinIsporuke = nacinIsporuke;
     }
 
     @Override

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UslugaRepozitorij extends JpaRepository<Usluga, Integer> {
-
+Usluga findById(int id);
 }

@@ -37,6 +37,10 @@ public class IndexController {
     PodatakRepozitorij podatakRepozitorij;
     @Autowired
     PodatakURegistruRepozitorij podatakURegistruRepozitorij;
+    @Autowired
+    UslugaRepozitorij uslugaRepozitorij;
+    @Autowired
+    NacinIsporukeRepozitorij nacinIsporukeRepozitorij;
 
     IspisPodataka podaci = new IspisPodataka();
 
@@ -46,7 +50,8 @@ public class IndexController {
     int serverid = 0;
     int registarid = 0;
     int institucijaid = 0;
-    Long oib=null;
+    Long oib = null;
+    int uslugaId = 4;
 
     @RequestMapping(value = {"/home"}, method = RequestMethod.GET)
     public String homePage(Model model) throws Exception {
@@ -77,6 +82,14 @@ public class IndexController {
         institucijaid = 0;
 
         oib = Long.parseLong(OIB);
+
+        Usluga u = uslugaRepozitorij.findById(uslugaId);
+        podaci.setUsluga(u.getNazivUsluge());
+        podaci.setNacinIsporuke(nacinIsporukeRepozitorij.findById(u.getNacinIsporukeId()).getNacinIsporuke());
+
+        dohvacanjePodataka += "Usluga: "+podaci.getUsluga()+ System.lineSeparator() +
+                "Nacin isporuke usluge: "+podaci.getNacinIsporuke();
+
         //dohvati prioritete ključne riječi - relacija RiječServis
         //u bazi pretražujemo tu tablicu, tražimo ključnu riječ s id-em kojeg smo označili na sučelju
         dohvacanjePodataka += "Pretraga prioriteta ključne riječi...";
@@ -103,7 +116,7 @@ public class IndexController {
         int krug = 0;
         boolean korisnikPronađen = false;
 
-        while (krug < listaPrioritetaKljucneRijeci.size()){
+        while (krug < listaPrioritetaKljucneRijeci.size()) {
             if (registarid == 1) {
                 if (korisnikPostojiRKD) {
 
@@ -142,7 +155,7 @@ public class IndexController {
             }
             krug++;
 
-            if (!korisnikPronađen && krug<listaPrioritetaKljucneRijeci.size()) {
+            if (!korisnikPronađen && krug < listaPrioritetaKljucneRijeci.size()) {
 
                 razinaPrioriteta++;
 
@@ -158,30 +171,30 @@ public class IndexController {
             }
 
         }
-        if(!korisnikPronađen){
-            dohvacanjePodataka+= System.lineSeparator() + "-----------------------------------------"+
-                    System.lineSeparator() + "Podaci o korisniku nisu pronađeni u registrima označenim prioritetima"+
+        if (!korisnikPronađen) {
+            dohvacanjePodataka += System.lineSeparator() + "-----------------------------------------" +
+                    System.lineSeparator() + "Podaci o korisniku nisu pronađeni u registrima označenim prioritetima" +
                     System.lineSeparator() + "Pretraga ostalih registara sustava RH...";
-            razinaPrioriteta=3;
+            razinaPrioriteta = 3;
             podaci.setPrioritet(prioritetRepozitorij.findById(3).getRazinaPrioriteta());
 
-            if(korisnikPostojiRKD){
-                webServis=1;
+            if (korisnikPostojiRKD) {
+                webServis = 1;
                 postaviPodatke();
                 ispisPodatakaRKD();
             }
-            if(korisnikPostojiRMR){
-                webServis=2;
+            if (korisnikPostojiRMR) {
+                webServis = 2;
                 postaviPodatke();
                 ispisPodatakaRMR();
             }
-            if(korisnikPostojiRMV){
-                webServis=3;
+            if (korisnikPostojiRMV) {
+                webServis = 3;
                 postaviPodatke();
                 ispisPodatakaRMV();
             }
-            if(korisnikPostojiRMU){
-                webServis=4;
+            if (korisnikPostojiRMU) {
+                webServis = 4;
                 postaviPodatke();
                 ispisPodatakaRMU();
             }
@@ -189,96 +202,95 @@ public class IndexController {
         }
 
         if (!korisnikPostojiRMV && !korisnikPostojiRMR && !korisnikPostojiRMU && !korisnikPostojiRKD) {
-            dohvacanjePodataka += System.lineSeparator()+"-------------------------------------------"
+            dohvacanjePodataka += System.lineSeparator() + "-------------------------------------------"
                     + "Za korisnika s OIB-om: " + oib + " ne postoje podaci niti u jednom registru";
         }
 
-        if(ime || prezime || datumRodjenja || drzavljanstvo || datumVjencanja ||djevojackoPrezime ||
-        OIBsupruznika || datumSmrti){
-            dohvacanjePodataka += "-----------------------------------------"+
+        if (ime || prezime || datumRodjenja || drzavljanstvo || datumVjencanja || djevojackoPrezime ||
+                OIBsupruznika || datumSmrti) {
+            dohvacanjePodataka += "-----------------------------------------" +
                     "Dohvaćanje dodatno označenih podataka ... ";
-        }
-        else {
+        } else {
             dohvacanjePodataka += "Niti jedan dodatni podatak nije označen. " +
                     "Dohvaćanje podataka za korisnika je završeno.";
         }
-        if (ime){
-        PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(1);
+        if (ime) {
+            PodatakURegistru pr = podatakURegistruRepozitorij.findByPodatakId(1);
             int reg = pr.getRegistarId();
             //na temelju registra bi trebali doći do podataka
             //ovo je malo hardkodirano jer su relacije s korisnicima odvojene
-            if(korisnikPostojiRMR){
+            if (korisnikPostojiRMR) {
                 podaci.setIme(restService.getKorisnikRMR(oib).getIme());
-            }else{
-                dohvacanjePodataka+="U definiranom registru nema podatka [ime] za korisnika s oibom: "+oib;
+            } else {
+                dohvacanjePodataka += "U definiranom registru nema podatka [ime] za korisnika s oibom: " + oib;
             }
 
         }
-        if(prezime){
-            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(2);
+        if (prezime) {
+            PodatakURegistru pr = podatakURegistruRepozitorij.findByPodatakId(2);
             int reg = pr.getRegistarId();
-            if(korisnikPostojiRMR){
+            if (korisnikPostojiRMR) {
                 podaci.setPrezime(restService.getKorisnikRMR(oib).getPrezime());
-            }else{
-                dohvacanjePodataka+="U definiranom registru nema podatka [prezime] za korisnika s oibom: "+oib;
+            } else {
+                dohvacanjePodataka += "U definiranom registru nema podatka [prezime] za korisnika s oibom: " + oib;
             }
 
         }
-        if(datumRodjenja){
-            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(3);
+        if (datumRodjenja) {
+            PodatakURegistru pr = podatakURegistruRepozitorij.findByPodatakId(3);
             int reg = pr.getRegistarId();
-            if(korisnikPostojiRMR){
+            if (korisnikPostojiRMR) {
                 podaci.setDatumRodenja(restService.getKorisnikRMR(oib).getDatumRodenja());
-            }else{
-                dohvacanjePodataka+="U definiranom registru nema podatka [datum rođenja] za korisnika s oibom: "+oib;
+            } else {
+                dohvacanjePodataka += "U definiranom registru nema podatka [datum rođenja] za korisnika s oibom: " + oib;
             }
         }
-        if(drzavljanstvo){
-            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(4);
+        if (drzavljanstvo) {
+            PodatakURegistru pr = podatakURegistruRepozitorij.findByPodatakId(4);
             int reg = pr.getRegistarId();
-            if(korisnikPostojiRKD){
+            if (korisnikPostojiRKD) {
                 podaci.setDrzavljanstvo(restService.getKorisnikRKD(oib).getDrzavljanstvo());
-            }else{
-                dohvacanjePodataka+="U definiranom registru nema podatka [državljanstvo] za korisnika s oibom: "+oib;
+            } else {
+                dohvacanjePodataka += "U definiranom registru nema podatka [državljanstvo] za korisnika s oibom: " + oib;
             }
         }
-        if(djevojackoPrezime){
-            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(5);
+        if (djevojackoPrezime) {
+            PodatakURegistru pr = podatakURegistruRepozitorij.findByPodatakId(5);
             int reg = pr.getRegistarId();
-            if(korisnikPostojiRMV){
+            if (korisnikPostojiRMV) {
                 podaci.setDjevojackoPrezime(restService.getKorisnikRMV(oib).getDjevojackoPrezime());
-            }else{
-                dohvacanjePodataka+="U definiranom registru nema podatka [djevojačko prezime] za korisnika s oibom: "+oib;
+            } else {
+                dohvacanjePodataka += "U definiranom registru nema podatka [djevojačko prezime] za korisnika s oibom: " + oib;
             }
 
         }
-        if(datumVjencanja){
-            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(6);
+        if (datumVjencanja) {
+            PodatakURegistru pr = podatakURegistruRepozitorij.findByPodatakId(6);
             int reg = pr.getRegistarId();
-            if(korisnikPostojiRMV){
+            if (korisnikPostojiRMV) {
                 podaci.setDatumVjencanja(restService.getKorisnikRMV(oib).getDatumVjencanja());
-            }else{
-                dohvacanjePodataka+="U definiranom registru nema podatka [datum vjenčanja] za korisnika s oibom: "+oib;
+            } else {
+                dohvacanjePodataka += "U definiranom registru nema podatka [datum vjenčanja] za korisnika s oibom: " + oib;
             }
 
         }
-        if(OIBsupruznika){
-            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(7);
+        if (OIBsupruznika) {
+            PodatakURegistru pr = podatakURegistruRepozitorij.findByPodatakId(7);
             int reg = pr.getRegistarId();
-            if(korisnikPostojiRMV){
+            if (korisnikPostojiRMV) {
                 podaci.setOIBsupruznika(restService.getKorisnikRMV(oib).getOIBSupruznika());
-            }else{
-                dohvacanjePodataka+="U definiranom registru nema podatka [OIB supružnika] za korisnika s oibom: "+oib;
+            } else {
+                dohvacanjePodataka += "U definiranom registru nema podatka [OIB supružnika] za korisnika s oibom: " + oib;
             }
 
         }
-        if(datumSmrti){
-            PodatakURegistru pr  = podatakURegistruRepozitorij.findByPodatakId(8);
+        if (datumSmrti) {
+            PodatakURegistru pr = podatakURegistruRepozitorij.findByPodatakId(8);
             int reg = pr.getRegistarId();
-            if(korisnikPostojiRMU){
+            if (korisnikPostojiRMU) {
                 podaci.setDatumSmrti(restService.getKorisnikRMU(oib).getDatumSmrti());
-            }else{
-                dohvacanjePodataka+="U definiranom registru nema podatka [datum smrti] za korisnika s oibom: "+oib;
+            } else {
+                dohvacanjePodataka += "U definiranom registru nema podatka [datum smrti] za korisnika s oibom: " + oib;
             }
 
         }
@@ -290,15 +302,14 @@ public class IndexController {
     }
 
 
-
     private void postaviPodatke() {
         podaci.setPrioritet(prioritetRepozitorij.findById(razinaPrioriteta).getRazinaPrioriteta());
         podaci.setWebServis(webServisRepozitorij.findById(webServis).getPutanja());
-        dohvacanjePodataka += System.getProperty("line.separator")+"\r\n-------------------------------------------------" +
-                "   ODABRANI PODACI ZA DOHVAT PODATAKA:" + System.getProperty("line.separator")+
-                System.getProperty("line.separator")+"\r\nPrioritet: " + podaci.getPrioritet() +
-                System.getProperty("line.separator")+"Web servis: " + podaci.getWebServis() +
-                System.getProperty("line.separator")+"-------------------------------------------------";
+        dohvacanjePodataka += System.getProperty("line.separator") + "\r\n-------------------------------------------------" +
+                "   ODABRANI PODACI ZA DOHVAT PODATAKA:" + System.getProperty("line.separator") +
+                System.getProperty("line.separator") + "\r\nPrioritet: " + podaci.getPrioritet() +
+                System.getProperty("line.separator") + "Web servis: " + podaci.getWebServis() +
+                System.getProperty("line.separator") + "-------------------------------------------------";
 
 
         serverid = webServisRepozitorij.findById(webServis).getServerId();
